@@ -1,0 +1,39 @@
+
+{{title}}
+Ahmer's to-do list:
+<div contain-fluid>
+
+<form action="/todos/add" method="POST">
+    <div class="form-group">
+        <label for="exampleInputEmail1">To do list</label>
+        <input name="task" class="form-control" id="exampleInputEmail1" aria-describedby="task submission" placeholder="Task">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+<div class="container-fluid">
+
+    <div class="to-do-list">
+
+        <h2>To do list</h2>
+
+        <hr>
+
+        <ul>
+            {{#each todolist}}
+
+            <li>
+                <form  action="/todos/done/{{id}}" id="form{{id}}" method="POST">
+                    <input id="checkbox1" type="checkbox" {{#if done}}checked{{/if}} onclick="document.querySelector('#form{{id}}').submit()">
+                    <label for="checkbox1">{{description}}</label>
+                </form>
+            </li>
+
+            {{/each}}
+        </ul>
+
+    </div> <!-- end to-do-list -->
+
+</div>
+</div>
