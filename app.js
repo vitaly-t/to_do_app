@@ -6,7 +6,6 @@ var db = pgp({database: 'todo_database'});
 
 
 
-
 /** sets the template engine to handle bars**/
 app.set('view engine', 'hbs');
 
@@ -14,14 +13,18 @@ app.set('view engine', 'hbs');
 app.use('/public', express.static('public'));
 app.use(body_parser.urlencoded({extended: false}));
 
+
+
+
+
 app.get("/", function (request, response) {
-    response.send('<html>');
+    response.render('landing.hbs');
 });
 /** this will render a response based on your url query: localhost:8000/cats will render "Meow meow meow" from your cat.hbs file **/
 /** express gives 3 arguments for each 'view'/'handler' **/
 app.get("/todos", function (request, response, next) {
     let query = "SELECT * FROM task";
-    db.many(query)
+    db.any(query)                                   //your website will crash unless .any(0 or more)  .many(1 or more)  .none (has to have 0) .one (has to have one) tasks in the database when the server requests data.
         .then(function(todolist){
             response.render('todos.hbs', {todolist: todolist});
         })
@@ -30,12 +33,29 @@ app.get("/todos", function (request, response, next) {
 });
 
 
-app.get('/todos/add', function (request, response) {
+app.post('/todos/add', function (request, response, next) {
     // insert query
-    response.redirect('/todos');
+    var description = request.body.task //grabs the  form named 'task' from todos.hbs
+    let update = "INSERT INTO task VALUES(default, $1, false)";  //inserts value into task table in the todo_database
+    db.any(update, description)
+        .then(function(){
+            response.redirect('/todos'); //redirects to todos page.
+        })
+        .catch(next);  //find out what this does. error catch for promise?
 
 });
 
+app.post('/todos/delete/:id', function (request, response, next) {
+    // insert query
+    var id = request.params.id;
+    let update = "DELETE FROM task WHERE id = $1;"  //inserts value into task table in the todo_database
+    db.any(update, id)
+        .then(function(){
+            response.redirect('/todos'); //redirects to todos page.
+        })
+        .catch(next);  // it passes it on to the next event. You can also catch an error.
+
+});
 
 app.post('/todos/done/:id', function (request, response, next) {
     //declare id aka slug from the database and put it at the end of the url on the todo page.
@@ -45,7 +65,7 @@ app.post('/todos/done/:id', function (request, response, next) {
     db.one(query, id)
         .then(function(task) {
             if (task.done){         //task.done means true. if you wanted to say false, !task.done
-                var update = "UPDATE task SET done = FALSE WHERE id = $1" ;
+                var update = "UPDATE task SET done = FALSE WHERE id = $1" ;  //$ makes only allows texts to be inserted. it is a method to protect your database from malicious attacks.
             }
             else {
                 var update = "UPDATE task SET done = TRUE WHERE id = $1" ;
