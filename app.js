@@ -20,6 +20,13 @@ app.use(body_parser.urlencoded({extended: false}));
 app.get("/", function (request, response) {
     response.render('landing.hbs');
 });
+
+app.get("/createaccount", function (request, response) {
+    let query = ""
+    response.render('userlogin.hbs');
+});
+
+
 /** this will render a response based on your url query: localhost:8000/cats will render "Meow meow meow" from your cat.hbs file **/
 /** express gives 3 arguments for each 'view'/'handler' **/
 app.get("/todos", function (request, response, next) {
@@ -31,6 +38,7 @@ app.get("/todos", function (request, response, next) {
 
     .catch(next);
 });
+
 
 
 app.post('/todos/add', function (request, response, next) {
