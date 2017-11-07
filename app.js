@@ -31,7 +31,7 @@ app.get("/createaccount", function (request, response) {
 /** express gives 3 arguments for each 'view'/'handler' **/
 app.get("/todos", function (request, response, next) {
     let query = "SELECT * FROM task";
-    db.any(query)                                   //your website will crash unless .any(0 or more)  .many(1 or more)  .none (has to have 0) .one (has to have one) tasks in the database when the server requests data.
+    db.any(query)                                   //your webpage will crash unless .any(0 or more)  .many(1 or more)  .none (has to have 0) .one (has to have one) tasks in the database when the server requests data.
         .then(function(todolist){
             response.render('todos.hbs', {todolist: todolist});
         })
