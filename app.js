@@ -45,7 +45,7 @@ app.post('/todos/add', function (request, response, next) {
     // insert query
     var description = request.body.task //grabs the  form named 'task' from todos.hbs
     let update = "INSERT INTO task VALUES(default, $1, false)";  //inserts value into task table in the todo_database
-    db.any(update, description)
+    db.none(update, description)
         .then(function(){
             response.redirect('/todos'); //redirects to todos page.
         })
@@ -57,7 +57,7 @@ app.post('/todos/delete/:id', function (request, response, next) {
     // insert query
     var id = request.params.id;
     let update = "DELETE FROM task WHERE id = $1;"  //inserts value into task table in the todo_database
-    db.any(update, id)
+    db.none(update, id)
         .then(function(){
             response.redirect('/todos'); //redirects to todos page.
         })
@@ -72,14 +72,15 @@ app.post('/todos/done/:id', function (request, response, next) {
     let query = "SELECT * FROM task WHERE id = $1";
     db.one(query, id)
         .then(function(task) {
+        /*
             if (task.done){         //task.done means true. if you wanted to say false, !task.done
                 var update = "UPDATE task SET done = FALSE WHERE id = $1" ;  //$ makes only allows texts to be inserted. it is a method to protect your database from malicious attacks.
             }
             else {
                 var update = "UPDATE task SET done = TRUE WHERE id = $1" ;
-            };
+            };*/
 
-            return  db.any(update, id);
+            return  db.any('IPDATE task SET done = $1 WHERE id = $2', [!!task.done, id]);
         })
         .then(function() {
             response.redirect('/todos');
